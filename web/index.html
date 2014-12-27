@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<!--
+  Copyright (c) 2014, <your name>. All rights reserved. Use of this source code
+  is governed by a BSD-style license that can be found in the LICENSE file.
+-->
+
+<html>
+<head>
+</head>
+
+<body>
+
+  <div>
+    <div style="float: left; margin-left: 20px;">
+      <input type="range" name="range_columns" id="range_columns" min="2" max="8">4<br>
+      <input type="range" name="range_rows" id="range_columns" min="2" max="8">4<br>
+    </div>
+    <div style="margin-left: 20px;">
+      <input type="radio" name="radio_picture" id="radio_picture">Picture
+        <select style="margin-left: 20px;">
+          <option value="f">Snowman</option>
+        </select><br>
+      <input type="radio" name="radio_picture" id="radio_numbers">Numbers<br>
+    </div>
+  </div>
+  <br>
+  <div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+
+
+  <script type="application/dart" src="main.dart"></script>
+  <script data-pub-inline src="packages/browser/dart.js"></script>
+</body>
+</html>
