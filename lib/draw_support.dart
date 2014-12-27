@@ -1,4 +1,4 @@
-library drawTable;
+library draw_support;
 
 
 import 'package:puzzle/setup.dart';
@@ -18,12 +18,16 @@ class Rect {
 }
 
 
+
+CanvasRenderingContext2D  _catchedContext;
+
+
 void prepareImage(Config config) {
   if (config.currentImage == null) {
-    writeLog("draw_table: Image not ready");
+    writeLog("draw_support: Image not ready");
     return;
   }
-  writeLog("draw_table: Preparing image");
+  writeLog("draw_support: Preparing image");
   var image = config.currentImage;
   var scale = getScale(image);
 
@@ -35,7 +39,7 @@ void prepareImage(Config config) {
   canvas
       ..width = cwidth
       ..height = cheight;
-  var context = canvas.context2D;
+  var context = getContext();
   context
       ..fillStyle = "rgba(0, 0, 0, 1)"
       ..fillRect(0, 0, cwidth, cheight);
@@ -49,11 +53,7 @@ void prepareImage(Config config) {
       context.drawImageScaledFromSource(image, ix, iy, ipieze_width, ipieze_height, rect.x, rect.y, rect.width, rect.height);
     }
   }
-  var rect = getRectPos(config.rows - 1, config.cols - 1, config);
-  context
-      ..fillStyle = "rgba(0, 0, 0, 1)"
-      ..fillRect(rect.x, rect.y, rect.width, rect.height);
-  writeLog("draw_table: Image ready");
+  writeLog("draw_support: Image ready");
 }
 
 
@@ -81,4 +81,12 @@ Rect getRectPos(int row, int col, Config config) {
   var x = col * piezeWidth + col;
   var y = row * piezeHeight + row;
   return new Rect(x, y, piezeWidth, piezeHeight);
+}
+
+CanvasRenderingContext2D  getContext(){
+  if(_catchedContext==null){
+    CanvasElement canvas = querySelector("#canvas");
+    _catchedContext = canvas.context2D;
+  }
+  return _catchedContext;
 }

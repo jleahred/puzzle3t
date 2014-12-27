@@ -27,7 +27,7 @@ class Config {
     writeLog("Updating config");
     _puzzle = new Plain(this);
     //currentImage = new ImageElement(src: "images/snowman2.png");
-    currentImage = new ImageElement(src: "images/lake.png");
+    currentImage = new ImageElement(src: "images/lake.jpg");
     currentImage.onLoad.listen((_) => _onModif.add(this));
     writeLog("Config updated");
   }
