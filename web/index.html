@@ -12,21 +12,25 @@
 <body>
 
   <div>
-    <div style="float: left; margin-left: 20px;">
-      <input type="range" name="range_columns" id="range_columns" min="2" max="8">4<br>
-      <input type="range" name="range_rows" id="range_columns" min="2" max="8">4<br>
+    <div  style="float: left;">
+      <input type="range" name="range_columns" id="range_columns" min="2" max="8"><br>
+      <input type="range" name="range_rows" id="range_columns" min="2" max="8"><br>
     </div>
-    <div style="margin-left: 20px;">
+    <div>
       <input type="radio" name="radio_picture" id="radio_picture">Picture
-        <select style="margin-left: 20px;">
-          <option value="f">Snowman</option>
+        <select style="margin-left: 40px;">
+          <option value="snowman.png">snowman.png</option>
+          <option value="horses.png">horses.png</option>
         </select><br>
-      <input type="radio" name="radio_picture" id="radio_numbers">Numbers<br>
+        <input type="radio" name="radio_picture" id="radio_numbers">Numbers<br>
     </div>
-  </div>
-  <br>
-  <div>
-    <canvas id="canvas"></canvas>
+    <div>
+      <br>
+      <canvas id="canvas"></canvas>
+      <br>
+      <textarea rows="10" cols="120" id="log">
+      </textarea>
+    </div>
   </div>
 
 

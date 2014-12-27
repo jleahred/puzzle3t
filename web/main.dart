@@ -3,8 +3,10 @@
 
 //import 'dart:html';
 import 'package:puzzle/setup.dart';
+import 'package:puzzle/log.dart';
 
 
 void main() {
+  writeLog("Running program");
   updateFromSetup();
 }

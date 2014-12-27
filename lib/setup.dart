@@ -2,15 +2,35 @@ library setup;
 
 import 'dart:html';
 import 'package:puzzle/plain.dart';
+import 'dart:async';
+import 'package:puzzle/log.dart';
 
 
-Config  _config;
+Config _config;
 
 class Config {
   var rows = 4;
   var cols = 4;
 
-  ConfigWidgets widgets = new ConfigWidgets();
+  ConfigWidgets _widgets = new ConfigWidgets();
+  var _puzzle;
+  ImageElement currentImage;
+
+  var _onModif = new StreamController<Config>.broadcast();
+  Stream<Config> get onModif => _onModif.stream;
+
+  Config() {
+    writeLog("Creating config");
+  }
+
+  void _update() {
+    writeLog("Updating config");
+    _puzzle = new Plain(this);
+    //currentImage = new ImageElement(src: "images/snowman2.png");
+    currentImage = new ImageElement(src: "images/lake.png");
+    currentImage.onLoad.listen((_) => _onModif.add(this));
+    writeLog("Config updated");
+  }
 }
 
 class ConfigWidgets {
@@ -18,11 +38,10 @@ class ConfigWidgets {
 
 
 void updateFromSetup() {
-  if(_config==null) {
+  if (_config == null) {
     _config = new Config();
-    _loadImages();
   }
-  var puzzle = createPlain(_config);
+  _config._update();
 }
 
 void _loadImages() {
