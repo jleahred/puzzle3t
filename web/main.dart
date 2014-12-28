@@ -8,5 +8,5 @@ import 'package:puzzle/log.dart';
 
 void main() {
   writeLog("Running program");
-  updateFromSetup();
+  updateHTMLFromSetup();
 }

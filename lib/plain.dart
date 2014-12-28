@@ -20,27 +20,32 @@ class Plain {
   _PlainStatus _status = new _PlainStatus();
 
   Plain(Config config) {
+    resetCanvas();
     _prepareConfig(config);
     _prepareEvents();
+  }
+
+  void reset() {
+    _status.config = null;
+    _status = null;
   }
 
 
   void _prepareConfig(Config config) {
     _status.config = config;
     _status.config.onModif.listen((_) => _onConfigModif());
+    _onConfigModif();
   }
   void _onConfigModif() {
     writeLog("Plain: Received config modif");
-    _prepareImage();
+    _status.holePossition = new Possition(_status.config.rows - 1, _status.config.cols - 1);
+    if(prepareImage(_status.config))
+    {
+      _drawHole();
+    }
     writeLog("Plain: Config modif processed");
   }
 
-  void _prepareImage() {
-    prepareImage(_status.config);
-
-    _status.holePossition = new Possition(_status.config.cols - 1, _status.config.rows - 1);
-    _drawHole();
-  }
 
   void _drawHole() {
     var rect = getRectPos(_status.holePossition.row, _status.holePossition.col, _status.config);
@@ -112,7 +117,7 @@ class Plain {
   }
 
   void randomize() {
-    for (var i in range(200)) {
+    for (var i in range(_status.config.cols * _status.config.rows * 20)) {
       var random = rang.nextInt(4);
       if (random == 0) {
         _moveLeft();

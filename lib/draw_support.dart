@@ -29,20 +29,22 @@ CanvasRenderingContext2D _catchedContext;
 CanvasElement _catchedCanvas;
 
 
-void prepareImage(Config config) {
-  if (config.currentImage == null) {
+bool prepareImage(Config config) {
+  if (config.currentImage == null || config.currentImage.width == 0) {
     writeLog("draw_support: Image not ready");
-    return;
+    return false;
   }
   writeLog("draw_support: Preparing image");
   var image = config.currentImage;
   var scale = getScale(image);
 
-  var cwidth = (image.width * scale + config.cols - 1).toInt();
-  var cheight = (image.height * scale + config.rows - 1).toInt();
+  var cwidth = image.width * scale;
+  cwidth = cwidth ~/ config.cols * config.cols + config.cols - 1;
+  var cheight = image.height * scale;
+  cheight = cheight ~/ config.rows * config.rows + config.rows - 1;
   var ipieze_width = image.width / config.cols;
   var ipieze_height = image.height / config.rows;
-  CanvasElement canvas = querySelector("#canvas");
+  CanvasElement canvas = getCanvas();
   canvas
       ..width = cwidth
       ..height = cheight;
@@ -61,6 +63,7 @@ void prepareImage(Config config) {
     }
   }
   writeLog("draw_support: Image ready");
+  return true;
 }
 
 
@@ -71,7 +74,7 @@ num getScale(ImageElement image) {
   //if (image.width > 1000) scalew = 1000.0 / image.width;
   //if (image.height > 1000) scaleh = 1000.0 / image.height;
   var scalew = 1000.0 / image.width;
-  var scaleh = 1000.0 / image.height;
+  var scaleh = 800.0 / image.height;
   return min(scalew, scaleh);
 }
 
@@ -93,8 +96,18 @@ Rect getRectPos(int row, int col, Config config) {
 
 CanvasElement getCanvas() {
   if (_catchedCanvas == null) {
-    _catchedCanvas = querySelector("#canvas");
+    resetCanvas();
   }
+  return _catchedCanvas;
+}
+
+CanvasElement resetCanvas() {
+  if (_catchedCanvas != null) {
+    _catchedCanvas.remove();
+    _catchedContext= null;
+  }
+  _catchedCanvas = new CanvasElement();
+  querySelector("#canvas_div").children.add(_catchedCanvas);
   return _catchedCanvas;
 }
 
@@ -131,4 +144,3 @@ void copyTo(Possition orig, Possition dest, Config config) {
   var rectDest = getRectPos(dest.row, dest.col, config);
   context.drawImageScaledFromSource(getCanvas(), rectOrigin.x, rectOrigin.y, rectOrigin.width, rectOrigin.height, rectDest.x, rectDest.y, rectDest.width, rectDest.height);
 }
-
