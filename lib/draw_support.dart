@@ -18,8 +18,15 @@ class Rect {
 }
 
 
+class Possition {
+  final int row, col;
+  Possition(this.row, this.col);
+}
 
-CanvasRenderingContext2D  _catchedContext;
+
+
+CanvasRenderingContext2D _catchedContext;
+CanvasElement _catchedCanvas;
 
 
 void prepareImage(Config config) {
@@ -75,18 +82,53 @@ Rect getRectPos(int row, int col, Config config) {
 
   var scale = getScale(image);
 
-  var piezeWidth = (image.width / config.cols * scale).toInt();
-  var piezeHeight = (image.height / config.rows * scale).toInt();
+  var piezeWidth = getPiezeWidth(config);
+  var piezeHeight = getPiezeHeight(config);
 
   var x = col * piezeWidth + col;
   var y = row * piezeHeight + row;
   return new Rect(x, y, piezeWidth, piezeHeight);
 }
 
-CanvasRenderingContext2D  getContext(){
-  if(_catchedContext==null){
-    CanvasElement canvas = querySelector("#canvas");
-    _catchedContext = canvas.context2D;
+
+CanvasElement getCanvas() {
+  if (_catchedCanvas == null) {
+    _catchedCanvas = querySelector("#canvas");
+  }
+  return _catchedCanvas;
+}
+
+
+CanvasRenderingContext2D getContext() {
+  if (_catchedContext == null) {
+    _catchedContext = getCanvas().context2D;
   }
   return _catchedContext;
 }
+
+
+int getPiezeWidth(Config config) => (getCanvas().clientWidth - (config.cols - 1)) ~/ config.cols;
+
+int getPiezeHeight(Config config) => (getCanvas().clientHeight - (config.rows - 1)) ~/ config.rows;
+
+
+Possition getPossitionFromCoords(int x, int y, Config config) {
+  int row = (y + y ~/ getPiezeHeight(config)) ~/ getPiezeHeight(config);
+  int col = (x + x ~/ getPiezeWidth(config)) ~/ getPiezeWidth(config);
+  return new Possition(row, col);
+}
+
+Possition getPossitionFromCanvasCoords(int x, int y, Config config) {
+  var cx = (x - getCanvas().getBoundingClientRect().left).toInt();
+  var cy = (y - getCanvas().getBoundingClientRect().top).toInt();
+
+  return getPossitionFromCoords(cx, cy, config);
+}
+
+void copyTo(Possition orig, Possition dest, Config config) {
+  var context = getContext();
+  var rectOrigin = getRectPos(orig.row, orig.col, config);
+  var rectDest = getRectPos(dest.row, dest.col, config);
+  context.drawImageScaledFromSource(getCanvas(), rectOrigin.x, rectOrigin.y, rectOrigin.width, rectOrigin.height, rectDest.x, rectDest.y, rectDest.width, rectDest.height);
+}
+

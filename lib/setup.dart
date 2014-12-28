@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:puzzle/plain.dart';
 import 'dart:async';
 import 'package:puzzle/log.dart';
+import 'package:puzzle/randomize.dart';
 
 
 Config _config;
@@ -12,7 +13,7 @@ class Config {
   var rows = 4;
   var cols = 4;
 
-  ConfigWidgets _widgets = new ConfigWidgets();
+  _ConfigWidgets _widgets = new _ConfigWidgets();
   var _puzzle;
   ImageElement currentImage;
 
@@ -33,7 +34,14 @@ class Config {
   }
 }
 
-class ConfigWidgets {
+class _ConfigWidgets {
+  _ConfigWidgets() {
+    querySelector("#randomize_button").onClick.listen((_) => _randomizePuzzle());
+  }
+}
+
+void _randomizePuzzle() {
+  randomize(_config._puzzle);
 }
 
 
