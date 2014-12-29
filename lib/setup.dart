@@ -5,13 +5,19 @@ import 'package:puzzle/plain.dart';
 import 'dart:async';
 import 'package:puzzle/log.dart';
 import 'package:puzzle/randomize.dart';
+import 'package:puzzle/images.dart';
+import 'package:puzzle/draw_support.dart';
 
 
 Config _config;
 
+
+enum ImageType { PICTURE, NUMBERS, COLORS }
+
 class Config {
-  var rows = 5;
-  var cols = 5;
+  var rows = 4;
+  var cols = 4;
+  ImageType  imageType = ImageType.PICTURE;
 
   _ConfigWidgets _widgets = new _ConfigWidgets();
   var _puzzle;
@@ -35,12 +41,26 @@ class Config {
 class _ConfigWidgets {
   NumberInputElement cols = querySelector("#range_columns");
   NumberInputElement rows = querySelector("#range_rows");
+  RadioButtonInputElement radioPicture = querySelector("#radio_picture");
+  RadioButtonInputElement radioNumbers = querySelector("#radio_numbers");
+  RadioButtonInputElement radioColors = querySelector("#radio_colors");
+  SelectElement imageList = querySelector("#image_list");
 
   _ConfigWidgets() {
     querySelector("#randomize_button").onClick.listen((_) => _randomizePuzzle());
 
     cols.onChange.listen((_) => updateFromHTMLSetup());
     rows.onChange.listen((_) => updateFromHTMLSetup());
+    radioPicture.onChange.listen((_) => updateFromHTMLSetup());
+    radioNumbers.onChange.listen((_) => updateFromHTMLSetup());
+    radioColors.onChange.listen((_) => updateFromHTMLSetup());
+
+    for(var imageName in localImages){
+      OptionElement option = new OptionElement();
+      option.text = imageName;
+      imageList.children.add(option);
+    }
+    imageList.onChange.listen((_) => updateFromHTMLSetup());
   }
 }
 
@@ -58,14 +78,21 @@ void updateHTMLFromSetup() {
   _config._widgets.cols.valueAsNumber = _config.cols;
   _config._widgets.rows.valueAsNumber = _config.rows;
 
+  switch(_config.imageType) {
+    case ImageType.PICTURE:
+      _config._widgets.radioPicture.checked = true;
+      break;
+    case ImageType.NUMBERS:
+      _config._widgets.radioNumbers.checked = true;
+      break;
+    case ImageType.COLORS:
+      _config._widgets.radioColors.checked = true;
+      break;
+  }
+
   updateFromHTMLSetup();
   writeLog("end updateHTMLFromSetup");
 }
-
-void _loadImages() {
-
-}
-
 
 void updateFromHTMLSetup() {
   writeLog("init updateFromHTMLSetup");
@@ -73,9 +100,28 @@ void updateFromHTMLSetup() {
     _config = new Config();
   }
 
-  if (_config.currentImage == null) {
-    _config.currentImage = new ImageElement(src: "images/horse.jpg");
-    _config.currentImage.onLoad.listen((_) => _config._onModif.add(_config));
+  if(_config._widgets.radioPicture.checked)
+  {
+    _config.imageType = ImageType.PICTURE;
+  } else if(_config._widgets.radioNumbers.checked) {
+    _config.imageType = ImageType.NUMBERS;
+  } else if(_config._widgets.radioColors.checked) {
+    _config.imageType = ImageType.COLORS;
+  }
+
+  switch(_config.imageType) {
+    case ImageType.PICTURE:
+      _config._widgets.imageList.hidden = false;
+      prepareImageFromServerFile("images/" + localImages[_config._widgets.imageList.selectedIndex], _config, _config._onModif.add);
+      break;
+    case ImageType.NUMBERS:
+      _config._widgets.imageList.hidden = true;
+      prepareCanvasNumbers(_config);
+      break;
+    case ImageType.COLORS:
+      _config._widgets.imageList.hidden = true;
+      prepareCanvasColors(_config);
+      break;
   }
 
   _config.cols = _config._widgets.cols.valueAsNumber.toInt();
@@ -84,3 +130,4 @@ void updateFromHTMLSetup() {
   _config._update();
   writeLog("end updateFromHTMLSetup");
 }
+

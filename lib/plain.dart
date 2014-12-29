@@ -18,6 +18,7 @@ class _PlainStatus {
 
 class Plain {
   _PlainStatus _status = new _PlainStatus();
+  var subscriptionConfigModif;
 
   Plain(Config config) {
     resetCanvas();
@@ -26,6 +27,9 @@ class Plain {
   }
 
   void reset() {
+    //  awfull
+    subscriptionConfigModif.cancel();
+
     _status.config = null;
     _status = null;
   }
@@ -33,7 +37,7 @@ class Plain {
 
   void _prepareConfig(Config config) {
     _status.config = config;
-    _status.config.onModif.listen((_) => _onConfigModif());
+    subscriptionConfigModif = _status.config.onModif.listen((_) => _onConfigModif());
     _onConfigModif();
   }
   void _onConfigModif() {
@@ -55,7 +59,7 @@ class Plain {
   }
   void _prepareEvents() {
     getCanvas().onClick.listen((event) => _onMouseDown(event));
-    window.onKeyDown.listen((event) => _onKeyPress(event));
+    //window.onKeyDown.listen((event) => _onKeyPress(event));
   }
 
   void _onMouseDown(MouseEvent event) {

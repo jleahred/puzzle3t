@@ -30,28 +30,43 @@ CanvasElement _catchedCanvas;
 
 
 bool prepareImage(Config config) {
+  switch (config.imageType) {
+    case ImageType.PICTURE:
+      return _prepareImageFromServerFile(config);
+    case ImageType.NUMBERS:
+      return prepareCanvasNumbers(config);
+    case ImageType.COLORS:
+      return prepareCanvasColors(config);
+  }
+}
+
+void _normalizeCanvasSize(Config config) {
+  CanvasElement canvas = getCanvas();
+  canvas
+      ..width = canvas.width ~/ config.cols * config.cols + config.cols - 1
+      ..height = canvas.height ~/ config.rows * config.rows + config.rows - 1;
+}
+
+bool _prepareImageFromServerFile(Config config) {
   if (config.currentImage == null || config.currentImage.width == 0) {
     writeLog("draw_support: Image not ready");
     return false;
   }
   writeLog("draw_support: Preparing image");
   var image = config.currentImage;
-  var scale = getScale(image);
+  var scale = getScaleFromImage(image);
 
-  var cwidth = image.width * scale;
-  cwidth = cwidth ~/ config.cols * config.cols + config.cols - 1;
-  var cheight = image.height * scale;
-  cheight = cheight ~/ config.rows * config.rows + config.rows - 1;
-  var ipieze_width = image.width / config.cols;
-  var ipieze_height = image.height / config.rows;
   CanvasElement canvas = getCanvas();
   canvas
-      ..width = cwidth
-      ..height = cheight;
+      ..width = (image.width * scale).toInt()
+      ..height = (image.height * scale).toInt();
+  _normalizeCanvasSize(config);
+  var ipieze_width = image.width / config.cols;
+  var ipieze_height = image.height / config.rows;
   var context = getContext();
   context
       ..fillStyle = "rgba(0, 0, 0, 1)"
-      ..fillRect(0, 0, cwidth, cheight);
+      ..fillRect(0, 0, canvas.width, canvas.height);
 
   for (int c in range(config.cols)) {
     for (int r in range(config.rows)) {
@@ -68,13 +83,13 @@ bool prepareImage(Config config) {
 
 
 
-num getScale(ImageElement image) {
-  //var scalew = 1.0;
-  //var scaleh = 1.0;
-  //if (image.width > 1000) scalew = 1000.0 / image.width;
-  //if (image.height > 1000) scaleh = 1000.0 / image.height;
-  var scalew = 1000.0 / image.width;
-  var scaleh = 800.0 / image.height;
+num getScaleFromImage(ImageElement image) {
+  return getScaleWH(image.width, image.height);
+}
+
+num getScaleWH(int width, int height) {
+  var scalew = 1000.0 / width;
+  var scaleh = 800.0 / height;
   return min(scalew, scaleh);
 }
 
@@ -83,7 +98,7 @@ num getScale(ImageElement image) {
 Rect getRectPos(int row, int col, Config config) {
   var image = config.currentImage;
 
-  var scale = getScale(image);
+  var scale = getScaleFromImage(image);
 
   var piezeWidth = getPiezeWidth(config);
   var piezeHeight = getPiezeHeight(config);
@@ -104,7 +119,7 @@ CanvasElement getCanvas() {
 CanvasElement resetCanvas() {
   if (_catchedCanvas != null) {
     _catchedCanvas.remove();
-    _catchedContext= null;
+    _catchedContext = null;
   }
   _catchedCanvas = new CanvasElement();
   querySelector("#canvas_div").children.add(_catchedCanvas);
@@ -143,4 +158,62 @@ void copyTo(Possition orig, Possition dest, Config config) {
   var rectOrigin = getRectPos(orig.row, orig.col, config);
   var rectDest = getRectPos(dest.row, dest.col, config);
   context.drawImageScaledFromSource(getCanvas(), rectOrigin.x, rectOrigin.y, rectOrigin.width, rectOrigin.height, rectDest.x, rectDest.y, rectDest.width, rectDest.height);
+}
+
+void _prepareCanvasGen(Config config, var drawCell) {
+  var canvas = getCanvas();
+  var scale = getScaleWH(1000, 800);
+  canvas
+      ..width = (1000 * scale).toInt()
+      ..height = (800 * scale).toInt();
+  _normalizeCanvasSize(config);
+
+  getContext()
+      ..fillStyle = "black"
+      ..fillRect(0, 0, canvas.width, canvas.height)
+      ..font = '18pt Arial'
+      ..fillStyle = "black";
+
+  int counter = 0;
+  for (var r in range(config.rows)) {
+    for (var c in range(config.cols)) {
+      var rect = getRectPos(r, c, config);
+      counter++;
+
+      drawCell(r, c, rect, config);
+    }
+  }
+}
+
+
+void _drawNumberCell(int r, int c, Rect rect, Config config) {
+  var piezeWidth = getPiezeWidth(config);
+  var piezeHeight = getPiezeHeight(config);
+  getContext()
+      ..fillStyle = "white"
+      ..fillRect(rect.x, rect.y, rect.width, rect.height)
+      ..fillStyle = "blue"
+      ..fillText((r * config.cols + c + 1).toString(), rect.x + piezeWidth / 3, rect.y + piezeHeight / 3);
+}
+
+
+bool prepareCanvasNumbers(Config config) {
+  _prepareCanvasGen(config, _drawNumberCell);
+  return true;
+}
+
+
+void _drawColorCell(int r, int c, Rect rect, Config config) {
+  var cr = c * (200 ~/ config.cols)+50;
+  var cg = 200 - c * (100 ~/ (config.cols~/2));
+  var cb = 100 - c * (150 ~/ (config.cols~/2))+150;
+
+  getContext()
+      ..fillStyle = "rgb($cr, $cg, $cb)"
+      ..fillRect(rect.x, rect.y, rect.width, rect.height);
+}
+
+bool prepareCanvasColors(Config config) {
+  _prepareCanvasGen(config, _drawColorCell);
+  return true;
 }
