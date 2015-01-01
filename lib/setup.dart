@@ -2,6 +2,7 @@ library setup;
 
 import 'dart:html';
 import 'package:puzzle/plain.dart';
+import 'package:puzzle/cylinder.dart';
 import 'dart:async';
 import 'package:puzzle/log.dart';
 import 'package:puzzle/randomize.dart';
@@ -12,9 +13,12 @@ import 'package:puzzle/draw_support.dart';
 Config _config;
 
 
+enum Topology { PLAIN, CYLINDER, TOROIDAL }
 enum ImageType { PICTURE, NUMBERS, COLORS, TWO_COLORS }
 
 class Config {
+  //var topology = Topology.PLAIN;
+  var topology = Topology.CYLINDER;
   var rows = 4;
   var cols = 4;
   ImageType  imageType = ImageType.PICTURE;
@@ -33,12 +37,18 @@ class Config {
   void _update() {
     writeLog("Updating config");
     if(_puzzle!=null) _puzzle.reset();
-    _puzzle = new Plain(this);
+
+    if(_widgets.topology.selectedIndex == 0) {
+      _puzzle = new Plain(this);
+    } else if(_widgets.topology.selectedIndex == 1) {
+      _puzzle = new Cylinder(this);
+    }
     writeLog("Config updated");
   }
 }
 
 class _ConfigWidgets {
+  SelectElement topology = querySelector("#topology_select");
   NumberInputElement cols = querySelector("#range_columns");
   NumberInputElement rows = querySelector("#range_rows");
   RadioButtonInputElement radioPicture = querySelector("#radio_picture");
@@ -58,6 +68,7 @@ class _ConfigWidgets {
       }
     });
 
+    topology.onChange.listen((_) => updateFromHTMLSetup());
     cols.onChange.listen((_) => updateFromHTMLSetup());
     rows.onChange.listen((_) => updateFromHTMLSetup());
     radioPicture.onChange.listen((_) => updateFromHTMLSetup());
@@ -85,6 +96,7 @@ void updateHTMLFromSetup() {
     _config = new Config();
   }
 
+  _config._widgets.topology.selectedIndex = _config.topology.index;
   _config._widgets.cols.valueAsNumber = _config.cols;
   _config._widgets.rows.valueAsNumber = _config.rows;
 
@@ -143,6 +155,7 @@ void updateFromHTMLSetup() {
       break;
   }
 
+  _config.topology = _config._widgets.topology;
   _config.cols = _config._widgets.cols.valueAsNumber.toInt();
   _config.rows = _config._widgets.rows.valueAsNumber.toInt();
 

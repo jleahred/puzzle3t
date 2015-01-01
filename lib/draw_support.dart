@@ -19,8 +19,13 @@ class Rect {
 
 
 class Possition {
-  final int row, col;
+  int row, col;
   Possition(this.row, this.col);
+
+  bool operator==(Possition other) {
+    if(other.row == row  &&  other.col==col)  return true;
+    else return false;
+  }
 }
 
 
@@ -162,6 +167,24 @@ void copyTo(Possition orig, Possition dest, Config config) {
   context.drawImageScaledFromSource(getCanvas(), rectOrigin.x, rectOrigin.y, rectOrigin.width, rectOrigin.height, rectDest.x, rectDest.y, rectDest.width, rectDest.height);
 }
 
+CanvasElement  copyToTempCanvas(Possition orig, Config config) {
+  var toTempCanvas = new CanvasElement();
+  var rectOrigin = getRectPos(orig.row, orig.col, config);
+  var context = toTempCanvas.context2D;
+  toTempCanvas
+      ..width = rectOrigin.width
+      ..height = rectOrigin.height;
+  context.drawImageScaledFromSource(getCanvas(), rectOrigin.x, rectOrigin.y, rectOrigin.width, rectOrigin.height, 0, 0, rectOrigin.width, rectOrigin.height);
+
+  return toTempCanvas;
+}
+
+void copyFromTempCanvas(Possition destiny, CanvasElement fromCanvas, Config config) {
+  var rectDest = getRectPos(destiny.row, destiny.col, config);
+  var context = getContext();
+  context.drawImageScaledFromSource(fromCanvas, 0, 0, fromCanvas.width, fromCanvas.height, rectDest.x, rectDest.y, rectDest.width, rectDest.height);
+}
+
 void _prepareCanvasGen(Config config, var drawCell) {
   var canvas = getCanvas();
   var scale = getScaleWH(1000, 800);
@@ -206,9 +229,9 @@ bool prepareCanvasNumbers(Config config) {
 
 
 void _drawColorCell(int r, int c, Rect rect, Config config) {
-  var cr = c * (200 ~/ config.cols)+50;
-  var cg = 200 - c * (100 ~/ (config.cols~/2));
-  var cb = 100 - c * (150 ~/ (config.cols~/2))+150;
+  var cr = c * (200 ~/ config.cols) + 50;
+  var cg = 200 - c * (100 ~/ (config.cols ~/ 2));
+  var cb = 100 - c * (150 ~/ (config.cols ~/ 2)) + 150;
 
   getContext()
       ..fillStyle = "rgb($cr, $cg, $cb)"
@@ -222,7 +245,7 @@ bool prepareCanvasColors(Config config) {
 
 
 void _draw2ColorCell(int r, int c, Rect rect, Config config) {
-  var color = c%2==0  ? '#006666' : '#CC0066';
+  var color = c % 2 == 0 ? '#006666' : '#CC0066';
 
   getContext()
       ..fillStyle = color
