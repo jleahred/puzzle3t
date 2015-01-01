@@ -8,6 +8,7 @@ import 'package:puzzle/log.dart';
 import 'package:puzzle/randomize.dart';
 import 'package:puzzle/images.dart';
 import 'package:puzzle/draw_support.dart';
+import 'package:puzzle/toroidal.dart';
 
 
 Config _config;
@@ -18,7 +19,7 @@ enum ImageType { PICTURE, NUMBERS, COLORS, TWO_COLORS }
 
 class Config {
   //var topology = Topology.PLAIN;
-  var topology = Topology.CYLINDER;
+  var topology = Topology.TOROIDAL;
   var rows = 4;
   var cols = 4;
   ImageType  imageType = ImageType.PICTURE;
@@ -42,6 +43,8 @@ class Config {
       _puzzle = new Plain(this);
     } else if(_widgets.topology.selectedIndex == 1) {
       _puzzle = new Cylinder(this);
+    } else if(_widgets.topology.selectedIndex == 2) {
+      _puzzle = new Toroidal(this);
     }
     writeLog("Config updated");
   }

@@ -1,4 +1,4 @@
-library cylinder;
+library toroidal;
 
 import 'package:puzzle/setup.dart';
 import 'package:puzzle/log.dart';
@@ -9,20 +9,19 @@ import 'package:range/range.dart';
 
 
 
-class _CylinderStatus {
+class _ToroidalStatus {
   Config config;
-  Possition holePossition;
   Possition startDrag;
   bool moved = false;
 }
 
 
 
-class Cylinder {
-  _CylinderStatus _status = new _CylinderStatus();
+class Toroidal {
+  _ToroidalStatus _status = new _ToroidalStatus();
   var subscriptionConfigModif;
 
-  Cylinder(Config config) {
+  Toroidal(Config config) {
     resetCanvas();
     _prepareConfig(config);
     _prepareEvents();
@@ -43,41 +42,21 @@ class Cylinder {
     _onConfigModif();
   }
   void _onConfigModif() {
-    writeLog("Cylinder: Received config modif");
-    _status.holePossition = new Possition(_status.config.rows - 1, _status.config.cols - 1);
-    if (prepareImage(_status.config)) {
-      _drawHole();
-    }
-    writeLog("Cylinder: Config modif processed");
+    writeLog("Toroidal: Received config modif");
+    prepareImage(_status.config);
+    writeLog("Toroidal: Config modif processed");
   }
 
 
-  void _drawHole() {
-    var rect = getRectPos(_status.holePossition.row, _status.holePossition.col, _status.config);
-    getContext()
-        ..fillStyle = "rgba(0, 0, 0, 1)"
-        ..fillRect(rect.x, rect.y, rect.width, rect.height);
-  }
   void _prepareEvents() {
     getCanvas().onMouseDown.listen((event) => _onMouseDown(event));
-    getCanvas().onMouseUp.listen((event) => _onMouseUp(event));
+    getCanvas().onMouseUp.listen((event) => _onMouseRelease(event));
     getCanvas().onMouseLeave.listen((event) => _onMouseRelease(event));
     getCanvas().onMouseMove.listen((event) => _onMouseMove(event));
   }
 
   void _onMouseDown(MouseEvent event) {
     _status.startDrag = getPossitionFromCanvasCoords(event.client.x, event.client.y, _status.config);
-  }
-
-  void _onMouseUp(MouseEvent event) {
-    var possition = getPossitionFromCanvasCoords(event.client.x, event.client.y, _status.config);
-
-    var distHoleRow = possition.row - _status.holePossition.row;
-
-    if (_status.moved == false && distHoleRow.abs().round() == 1 && _status.holePossition.col == possition.col && possition == _status.startDrag) {
-      _moveToHole(possition);
-    }
-    _onMouseRelease(event);
   }
 
   void _onMouseRelease(MouseEvent event) {
@@ -88,8 +67,8 @@ class Cylinder {
   void _onMouseMove(MouseEvent event) {
     var possition = getPossitionFromCanvasCoords(event.client.x, event.client.y, _status.config);
 
-    if (_status.startDrag != null && possition.row == _status.startDrag.row) {
-      if ((possition.col - _status.startDrag.col).abs().round() == 1) {
+    if (_status.startDrag != null) {
+      if ((possition.col - _status.startDrag.col).abs().round() == 1  &&  possition.row == _status.startDrag.row) {
         if (possition.col > _status.startDrag.col) {
           _moveRowRight(_status.startDrag.row);
         } else {
@@ -98,14 +77,18 @@ class Cylinder {
         _status.startDrag = possition;
         _status.moved = true;
       }
+      if ((possition.row - _status.startDrag.row).abs().round() == 1  &&  possition.col == _status.startDrag.col) {
+        if (possition.row > _status.startDrag.row) {
+          _moveColDown(_status.startDrag.col);
+        } else {
+          _moveColUp(_status.startDrag.col);
+        }
+        _status.startDrag = possition;
+        _status.moved = true;
+      }
     }
   }
 
-  void _moveToHole(Possition origin) {
-    copyTo(origin, _status.holePossition, _status.config);
-    _status.holePossition = origin;
-    _drawHole();
-  }
 
   void _moveRowLeft(int row) {
     var tempCanvas = copyToTempCanvas(new Possition(row, 0), _status.config);
@@ -115,10 +98,6 @@ class Cylinder {
       copyTo(origin, destiny, _status.config);
     }
     copyFromTempCanvas(new Possition(row, _status.config.cols - 1), tempCanvas, _status.config);
-    if (row == _status.holePossition.row) {
-      _status.holePossition.col -= 1;
-      if (_status.holePossition.col < 0) _status.holePossition.col = _status.config.cols - 1;
-    }
   }
 
   void _moveRowRight(int row) {
@@ -129,36 +108,39 @@ class Cylinder {
       copyTo(origin, destiny, _status.config);
     }
     copyFromTempCanvas(new Possition(row, 0), tempCanvas, _status.config);
-    if (row == _status.holePossition.row) {
-      _status.holePossition.col += 1;
-      if (_status.holePossition.col == _status.config.cols) _status.holePossition.col = 0;
-    }
   }
 
 
-  void _moveUp() {
-    if (_status.holePossition.row < _status.config.rows - 1) {
-      var origin = new Possition(_status.holePossition.row + 1, _status.holePossition.col);
-      _moveToHole(origin);
+  void _moveColUp(int col) {
+    var tempCanvas = copyToTempCanvas(new Possition(0, col), _status.config);
+    for (var r in range(0, _status.config.rows - 1, 1)) {
+      Possition origin = new Possition(r+1, col);
+      Possition destiny = new Possition(r, col);
+      copyTo(origin, destiny, _status.config);
     }
+    copyFromTempCanvas(new Possition(_status.config.rows - 1, col), tempCanvas, _status.config);
   }
 
-  void _moveDown() {
-    if (_status.holePossition.row > 0) {
-      var origin = new Possition(_status.holePossition.row - 1, _status.holePossition.col);
-      _moveToHole(origin);
+  void _moveColDown(int col) {
+    var tempCanvas = copyToTempCanvas(new Possition(_status.config.rows - 1, col), _status.config);
+    for (var r in range(_status.config.rows - 2, -1, -1)) {
+      Possition origin = new Possition(r, col);
+      Possition destiny = new Possition(r + 1, col);
+      copyTo(origin, destiny, _status.config);
     }
+    copyFromTempCanvas(new Possition(0, col), tempCanvas, _status.config);
   }
 
   void randomize() {
     for (var i in range(_status.config.cols * _status.config.rows * 20)) {
       var random = rang.nextInt(2);
       if (random == 0) { //  move column
-        var rcolumn = rang.nextInt(2);
-        if (rcolumn == 0) {
-          _moveUp();
+        var rcol = rang.nextInt(_status.config.cols);
+        var rdir = rang.nextInt(2);
+        if (rdir == 0) {
+          _moveColUp(rcol);
         } else {
-          _moveDown();
+          _moveColDown(rcol);
         }
       } else { // move row
         var rrow = rang.nextInt(_status.config.rows);
