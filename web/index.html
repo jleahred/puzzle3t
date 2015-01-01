@@ -16,32 +16,40 @@
     <button id="setup_button">setup</button>
     <br>
 
-    <table>
-      <tr>
-        <td>
-          colums:<input type="number" name="range_columns" id="range_columns" min="2" max="8" value="4"></input><br>
-          rows:<input type="number" name="range_rows" id="range_rows" min="2" max="8" value="4"></input>
-        </td>
-        <td>
-          <div style="margin-left: 40px">
-            <input type="radio" name="r_image_type" id="radio_picture">Picture
-            <select style="margin-left: 40px;" id="image_list">
-            </select><br>
-            <input type="radio" name="r_image_type" id="radio_numbers">Numbers<br>
-            <input type="radio" name="r_image_type" id="radio_colors">Colors<br>
-            <input type="radio" name="r_image_type" id="radio_2colors">2 Colors
-          </div>
-        </td>
-      <tr>
-        <td>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        </td>
-      </tr>
-    </table>
+    <div id="setup_div" style="display:none">
+      <br> Topology:
+      <select style="margin-left: 0px;" id="topology_select">
+        <option value="plain">Plain</option>
+        <option value="cilinder">Cilinder</option>
+        <option value="toroidal">Toroidal</option>
+      </select><br>
 
+      <table>
+        <tr>
+          <td>
+            colums:<input type="number" name="range_columns" id="range_columns" min="2" max="8" value="4"></input><br>
+            rows:<input type="number" name="range_rows" id="range_rows" min="2" max="8" value="4"></input>
+          </td>
+          <td>
+            <div style="margin-left: 40px">
+              <input type="radio" name="r_image_type" id="radio_picture">Picture
+              <select style="margin-left: 40px;" id="image_list">
+              </select><br>
+              <input type="radio" name="r_image_type" id="radio_numbers">Numbers<br>
+              <input type="radio" name="r_image_type" id="radio_colors">Colors<br>
+              <input type="radio" name="r_image_type" id="radio_2colors">2 Colors
+            </div>
+          </td>
+        <tr>
+          <td>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          </td>
+        </tr>
+      </table>
+    </div>
 
     <br>
     <div id="canvas_div">

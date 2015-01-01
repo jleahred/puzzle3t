@@ -49,6 +49,14 @@ class _ConfigWidgets {
 
   _ConfigWidgets() {
     querySelector("#randomize_button").onClick.listen((_) => _randomizePuzzle());
+    querySelector("#setup_button").onClick.listen((_) {
+      var setup_div = querySelector("#setup_div");
+      if(setup_div.style.display != "") {
+        querySelector("#setup_div").style.display = "";
+      } else {
+        querySelector("#setup_div").style.display = "none";
+      }
+    });
 
     cols.onChange.listen((_) => updateFromHTMLSetup());
     rows.onChange.listen((_) => updateFromHTMLSetup());
