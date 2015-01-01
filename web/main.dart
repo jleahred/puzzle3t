@@ -15,9 +15,12 @@ void main() {
 
 
 void _prepareReadme() {
+  writeLog("Requested readme file to server");
   var readmeText = new ParagraphElement();
 
   querySelector("#readme_div").children.add(readmeText);
-  HttpRequest.getString("README.md")
-      .then((text) => readmeText.appendHtml(markdownToHtml(text)));
+  HttpRequest.getString("README.md").then((text) {
+    readmeText.appendHtml(markdownToHtml(text));
+    writeLog("Received readme.md from server and rendered on page");
+  });
 }

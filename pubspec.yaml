@@ -10,3 +10,6 @@ dependencies:
   script_inliner: '>=1.0.0 <2.0.0'
 transformers:
 - script_inliner
+- $dart2js:
+    commandLineOptions: [--enable-enum]
+    minify: true
