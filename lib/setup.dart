@@ -18,8 +18,7 @@ enum Topology { PLAIN, CYLINDER, TOROIDAL }
 enum ImageType { PICTURE, NUMBERS, COLORS, TWO_COLORS }
 
 class Config {
-  //var topology = Topology.PLAIN;
-  var topology = Topology.TOROIDAL;
+  var topology = Topology.PLAIN;
   var rows = 4;
   var cols = 4;
   ImageType  imageType = ImageType.PICTURE;
@@ -62,14 +61,9 @@ class _ConfigWidgets {
 
   _ConfigWidgets() {
     querySelector("#randomize_button").onClick.listen((_) => _randomizePuzzle());
-    querySelector("#setup_button").onClick.listen((_) {
-      var setup_div = querySelector("#setup_div");
-      if(setup_div.style.display != "") {
-        querySelector("#setup_div").style.display = "";
-      } else {
-        querySelector("#setup_div").style.display = "none";
-      }
-    });
+    querySelector("#setup_button").onClick.listen((_) => _showHideDivs(querySelector("#setup_div"), querySelector("#readme_div")));
+    querySelector("#readme_button").onClick.listen((_) => _showHideDivs(querySelector("#readme_div"), querySelector("#setup_div")));
+
 
     topology.onChange.listen((_) => updateFromHTMLSetup());
     cols.onChange.listen((_) => updateFromHTMLSetup());
@@ -86,6 +80,16 @@ class _ConfigWidgets {
     }
     imageList.onChange.listen((_) => updateFromHTMLSetup());
   }
+}
+
+
+void _showHideDivs(var div1, var div2){
+  if(div1.style.display != "") {
+    div1.style.display = "";
+  } else {
+    div1.style.display = "none";
+  }
+  div2.style.display = "none";
 }
 
 void _randomizePuzzle() {
