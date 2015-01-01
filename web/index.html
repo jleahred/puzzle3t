@@ -15,25 +15,40 @@
     <button id="randomize_button">randomize</button>
     <button id="setup_button">setup</button>
     <br>
-    <div  style="float: left; margin-left: 10px; margin-right: 20px;">
-      colums:<input type="number" name="range_columns" id="range_columns" min="2" max="8" value="4"></input><br>
-      rows:<input type="number" name="range_rows" id="range_rows" min="2" max="8" value="4"></input><br>
+
+    <table>
+      <tr>
+        <td>
+          colums:<input type="number" name="range_columns" id="range_columns" min="2" max="8" value="4"></input><br>
+          rows:<input type="number" name="range_rows" id="range_rows" min="2" max="8" value="4"></input>
+        </td>
+        <td>
+          <div style="margin-left: 40px">
+            <input type="radio" name="r_image_type" id="radio_picture">Picture
+            <select style="margin-left: 40px;" id="image_list">
+            </select><br>
+            <input type="radio" name="r_image_type" id="radio_numbers">Numbers<br>
+            <input type="radio" name="r_image_type" id="radio_colors">Colors<br>
+            <input type="radio" name="r_image_type" id="radio_2colors">2 Colors
+          </div>
+        </td>
+      <tr>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        </td>
+      </tr>
+    </table>
+
+
+    <br>
+    <div id="canvas_div">
     </div>
-    <div>
-      <input type="radio" name="r_image_type" id="radio_picture">Picture
-        <select style="margin-left: 40px;" id="image_list">
-        </select><br>
-        <input type="radio" name="r_image_type" id="radio_numbers">Numbers<br>
-        <input type="radio" name="r_image_type" id="radio_colors">Colors<br>
-    </div>
-    <div>
-      <br>
-      <div id="canvas_div">
-      </div>
-      <br>
-      <textarea rows="10" cols="120" id="log">
-      </textarea>
-    </div>
+    <br>
+    <textarea rows="10" cols="120" id="log">
+    </textarea>
   </div>
 
 

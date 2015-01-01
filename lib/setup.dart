@@ -12,7 +12,7 @@ import 'package:puzzle/draw_support.dart';
 Config _config;
 
 
-enum ImageType { PICTURE, NUMBERS, COLORS }
+enum ImageType { PICTURE, NUMBERS, COLORS, TWO_COLORS }
 
 class Config {
   var rows = 4;
@@ -44,6 +44,7 @@ class _ConfigWidgets {
   RadioButtonInputElement radioPicture = querySelector("#radio_picture");
   RadioButtonInputElement radioNumbers = querySelector("#radio_numbers");
   RadioButtonInputElement radioColors = querySelector("#radio_colors");
+  RadioButtonInputElement radio2Colors = querySelector("#radio_2colors");
   SelectElement imageList = querySelector("#image_list");
 
   _ConfigWidgets() {
@@ -54,6 +55,7 @@ class _ConfigWidgets {
     radioPicture.onChange.listen((_) => updateFromHTMLSetup());
     radioNumbers.onChange.listen((_) => updateFromHTMLSetup());
     radioColors.onChange.listen((_) => updateFromHTMLSetup());
+    radio2Colors.onChange.listen((_) => updateFromHTMLSetup());
 
     for(var imageName in localImages){
       OptionElement option = new OptionElement();
@@ -88,6 +90,9 @@ void updateHTMLFromSetup() {
     case ImageType.COLORS:
       _config._widgets.radioColors.checked = true;
       break;
+    case ImageType.TWO_COLORS:
+      _config._widgets.radio2Colors.checked = true;
+      break;
   }
 
   updateFromHTMLSetup();
@@ -107,6 +112,8 @@ void updateFromHTMLSetup() {
     _config.imageType = ImageType.NUMBERS;
   } else if(_config._widgets.radioColors.checked) {
     _config.imageType = ImageType.COLORS;
+  } else if(_config._widgets.radio2Colors.checked) {
+    _config.imageType = ImageType.TWO_COLORS;
   }
 
   switch(_config.imageType) {
@@ -121,6 +128,10 @@ void updateFromHTMLSetup() {
     case ImageType.COLORS:
       _config._widgets.imageList.hidden = true;
       prepareCanvasColors(_config);
+      break;
+    case ImageType.TWO_COLORS:
+      _config._widgets.imageList.hidden = true;
+      prepareCanvas2Colors(_config);
       break;
   }
 

@@ -37,6 +37,8 @@ bool prepareImage(Config config) {
       return prepareCanvasNumbers(config);
     case ImageType.COLORS:
       return prepareCanvasColors(config);
+    case ImageType.TWO_COLORS:
+      return prepareCanvas2Colors(config);
   }
 }
 
@@ -215,5 +217,20 @@ void _drawColorCell(int r, int c, Rect rect, Config config) {
 
 bool prepareCanvasColors(Config config) {
   _prepareCanvasGen(config, _drawColorCell);
+  return true;
+}
+
+
+void _draw2ColorCell(int r, int c, Rect rect, Config config) {
+  var color = c%2==0  ? '#006666' : '#CC0066';
+
+  getContext()
+      ..fillStyle = color
+      ..fillRect(rect.x, rect.y, rect.width, rect.height);
+}
+
+
+bool prepareCanvas2Colors(Config config) {
+  _prepareCanvasGen(config, _draw2ColorCell);
   return true;
 }
