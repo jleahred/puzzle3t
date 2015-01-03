@@ -158,15 +158,22 @@ void updateFromHTMLSetup() {
       break;
     case ImageType.TWO_COLORS:
       _config._widgets.imageList.hidden = true;
-      prepareCanvas2Colors(_config);
+      prepareCanvasColors(_config);
       break;
   }
 
   _config.topology = _config._widgets.topology;
-  _config.cols = _config._widgets.cols.valueAsNumber.toInt();
-  _config.rows = _config._widgets.rows.valueAsNumber.toInt();
+
+  _config.cols = getValueCheckingBounds(_config._widgets.cols);
+  _config.rows = getValueCheckingBounds(_config._widgets.rows);
 
   _config._update();
   writeLog("end updateFromHTMLSetup");
 }
 
+int getValueCheckingBounds(var widget) {
+  if(widget.valueAsNumber.toInt() > int.parse(widget.max)) {
+    widget.valueAsNumber = int.parse(widget.max);
+  }
+  return widget.valueAsNumber.toInt();
+}

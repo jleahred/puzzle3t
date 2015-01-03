@@ -43,7 +43,7 @@ bool prepareImage(Config config) {
     case ImageType.COLORS:
       return prepareCanvasColors(config);
     case ImageType.TWO_COLORS:
-      return prepareCanvas2Colors(config);
+      return prepareCanvasColors(config);
   }
 }
 
@@ -229,12 +229,14 @@ bool prepareCanvasNumbers(Config config) {
 
 
 void _drawColorCell(int r, int c, Rect rect, Config config) {
-  var cr = c * (200 ~/ config.cols) + 50;
+  var colors = ["pink", "red", "orange", "yellow", "green", "blue", "gray", "cyan"];
+  /*var cr = c * (200 ~/ config.cols) + 50;
   var cg = 200 - c * (100 ~/ (config.cols ~/ 2));
   var cb = 100 - c * (150 ~/ (config.cols ~/ 2)) + 150;
-
+  */
+  var nColors = config.imageType == ImageType.TWO_COLORS ? 2 : config.cols;
   getContext()
-      ..fillStyle = "rgb($cr, $cg, $cb)"
+      ..fillStyle = colors[c % nColors]
       ..fillRect(rect.x, rect.y, rect.width, rect.height);
 }
 
@@ -244,16 +246,3 @@ bool prepareCanvasColors(Config config) {
 }
 
 
-void _draw2ColorCell(int r, int c, Rect rect, Config config) {
-  var color = c % 2 == 0 ? '#006666' : '#CC0066';
-
-  getContext()
-      ..fillStyle = color
-      ..fillRect(rect.x, rect.y, rect.width, rect.height);
-}
-
-
-bool prepareCanvas2Colors(Config config) {
-  _prepareCanvasGen(config, _draw2ColorCell);
-  return true;
-}
