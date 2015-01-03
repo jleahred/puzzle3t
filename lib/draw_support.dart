@@ -26,6 +26,12 @@ class Possition {
     if(other.row == row  &&  other.col==col)  return true;
     else return false;
   }
+
+  Possition assign(Possition other) {
+    this.row = other.row;
+    this.col = other.col;
+    return this;
+  }
 }
 
 
@@ -230,10 +236,6 @@ bool prepareCanvasNumbers(Config config) {
 
 void _drawColorCell(int r, int c, Rect rect, Config config) {
   var colors = ["pink", "red", "orange", "yellow", "green", "blue", "gray", "cyan"];
-  /*var cr = c * (200 ~/ config.cols) + 50;
-  var cg = 200 - c * (100 ~/ (config.cols ~/ 2));
-  var cb = 100 - c * (150 ~/ (config.cols ~/ 2)) + 150;
-  */
   var nColors = config.imageType == ImageType.TWO_COLORS ? 2 : config.cols;
   getContext()
       ..fillStyle = colors[c % nColors]
@@ -245,4 +247,52 @@ bool prepareCanvasColors(Config config) {
   return true;
 }
 
+
+void moveRowLeft(int row, Config config) {
+  var tempCanvas = copyToTempCanvas(new Possition(row, 0), config);
+  for (var c in range(0, config.cols - 1, 1)) {
+    Possition origin = new Possition(row, c + 1);
+    Possition destiny = new Possition(row, c);
+    copyTo(origin, destiny, config);
+  }
+  copyFromTempCanvas(new Possition(row, config.cols - 1), tempCanvas, config);
+}
+
+void moveRowRight(int row, Config config) {
+  var tempCanvas = copyToTempCanvas(new Possition(row, config.cols - 1), config);
+  for (var c in range(config.cols - 2, -1, -1)) {
+    Possition origin = new Possition(row, c);
+    Possition destiny = new Possition(row, c + 1);
+    copyTo(origin, destiny, config);
+  }
+  copyFromTempCanvas(new Possition(row, 0), tempCanvas, config);
+}
+
+
+void drawHole(Possition holePossition, Config config) {
+  var rect = getRectPos(holePossition.row, holePossition.col, config);
+  getContext()
+      ..fillStyle = "rgba(0, 0, 0, 1)"
+      ..fillRect(rect.x, rect.y, rect.width, rect.height);
+}
+
+void moveToHole(Possition origin, Possition holePossition, Config config) {
+  copyTo(origin, holePossition, config);
+  holePossition.assign(origin);
+  drawHole(holePossition, config);
+}
+
+void moveUp(Possition  holePossition, Config config) {
+  if (holePossition.row < config.rows - 1) {
+    var origin = new Possition(holePossition.row + 1, holePossition.col);
+    moveToHole(origin, holePossition, config);
+  }
+}
+
+void moveDown(Possition  holePossition, Config config) {
+  if (holePossition.row > 0) {
+    var origin = new Possition(holePossition.row - 1, holePossition.col);
+    moveToHole(origin, holePossition, config);
+  }
+}
 

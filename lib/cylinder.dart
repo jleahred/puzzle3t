@@ -46,18 +46,12 @@ class Cylinder {
     writeLog("Cylinder: Received config modif");
     _status.holePossition = new Possition(_status.config.rows - 1, _status.config.cols - 1);
     if (prepareImage(_status.config)) {
-      _drawHole();
+      drawHole(_status.holePossition, _status.config);
     }
     writeLog("Cylinder: Config modif processed");
   }
 
 
-  void _drawHole() {
-    var rect = getRectPos(_status.holePossition.row, _status.holePossition.col, _status.config);
-    getContext()
-        ..fillStyle = "rgba(0, 0, 0, 1)"
-        ..fillRect(rect.x, rect.y, rect.width, rect.height);
-  }
   void _prepareEvents() {
     getCanvas().onMouseDown.listen((event) => _onMouseDown(event));
     getCanvas().onMouseUp.listen((event) => _onMouseUp(event));
@@ -75,7 +69,7 @@ class Cylinder {
     var distHoleRow = possition.row - _status.holePossition.row;
 
     if (_status.moved == false && distHoleRow.abs().round() == 1 && _status.holePossition.col == possition.col && possition == _status.startDrag) {
-      _moveToHole(possition);
+      moveToHole(possition, _status.holePossition, _status.config);
     }
     _onMouseRelease(event);
   }
@@ -101,20 +95,9 @@ class Cylinder {
     }
   }
 
-  void _moveToHole(Possition origin) {
-    copyTo(origin, _status.holePossition, _status.config);
-    _status.holePossition = origin;
-    _drawHole();
-  }
 
   void _moveRowLeft(int row) {
-    var tempCanvas = copyToTempCanvas(new Possition(row, 0), _status.config);
-    for (var c in range(0, _status.config.cols - 1, 1)) {
-      Possition origin = new Possition(row, c + 1);
-      Possition destiny = new Possition(row, c);
-      copyTo(origin, destiny, _status.config);
-    }
-    copyFromTempCanvas(new Possition(row, _status.config.cols - 1), tempCanvas, _status.config);
+    moveRowLeft(row, _status.config);
     if (row == _status.holePossition.row) {
       _status.holePossition.col -= 1;
       if (_status.holePossition.col < 0) _status.holePossition.col = _status.config.cols - 1;
@@ -122,13 +105,7 @@ class Cylinder {
   }
 
   void _moveRowRight(int row) {
-    var tempCanvas = copyToTempCanvas(new Possition(row, _status.config.cols - 1), _status.config);
-    for (var c in range(_status.config.cols - 2, -1, -1)) {
-      Possition origin = new Possition(row, c);
-      Possition destiny = new Possition(row, c + 1);
-      copyTo(origin, destiny, _status.config);
-    }
-    copyFromTempCanvas(new Possition(row, 0), tempCanvas, _status.config);
+    moveRowRight(row, _status.config);
     if (row == _status.holePossition.row) {
       _status.holePossition.col += 1;
       if (_status.holePossition.col == _status.config.cols) _status.holePossition.col = 0;
@@ -136,19 +113,6 @@ class Cylinder {
   }
 
 
-  void _moveUp() {
-    if (_status.holePossition.row < _status.config.rows - 1) {
-      var origin = new Possition(_status.holePossition.row + 1, _status.holePossition.col);
-      _moveToHole(origin);
-    }
-  }
-
-  void _moveDown() {
-    if (_status.holePossition.row > 0) {
-      var origin = new Possition(_status.holePossition.row - 1, _status.holePossition.col);
-      _moveToHole(origin);
-    }
-  }
 
   void randomize() {
     for (var i in range(_status.config.cols * _status.config.rows * 20)) {
@@ -156,9 +120,9 @@ class Cylinder {
       if (random == 0) { //  move column
         var rcolumn = rang.nextInt(2);
         if (rcolumn == 0) {
-          _moveUp();
+          moveUp(_status.holePossition, _status.config);
         } else {
-          _moveDown();
+          moveDown(_status.holePossition, _status.config);
         }
       } else { // move row
         var rrow = rang.nextInt(_status.config.rows);

@@ -45,18 +45,12 @@ class Plain {
     _status.holePossition = new Possition(_status.config.rows - 1, _status.config.cols - 1);
     if(prepareImage(_status.config))
     {
-      _drawHole();
+      drawHole(_status.holePossition, _status.config);
     }
     writeLog("Plain: Config modif processed");
   }
 
 
-  void _drawHole() {
-    var rect = getRectPos(_status.holePossition.row, _status.holePossition.col, _status.config);
-    getContext()
-        ..fillStyle = "rgba(0, 0, 0, 1)"
-        ..fillRect(rect.x, rect.y, rect.width, rect.height);
-  }
   void _prepareEvents() {
     getCanvas().onClick.listen((event) => _onMouseDown(event));
     //window.onKeyDown.listen((event) => _onKeyPress(event));
@@ -69,56 +63,37 @@ class Plain {
     var distHoleRow = possition.row - _status.holePossition.row;
 
     if ((distHoleCol.abs() + distHoleRow.abs()).round() == 1) {
-      _moveToHole(possition);
+      moveToHole(possition, _status.holePossition, _status.config);
     }
   }
 
 
-  void _moveToHole(Possition origin) {
-    copyTo(origin, _status.holePossition, _status.config);
-    _status.holePossition = origin;
-    _drawHole();
-  }
-
-  void _onKeyPress(KeyboardEvent event) {
+  /*void _onKeyPress(KeyboardEvent event) {
     if (event.keyCode == KeyCode.LEFT) {
       _moveLeft();
     } else if (event.keyCode == KeyCode.RIGHT) {
       _moveRight();
     } else if (event.keyCode == KeyCode.UP) {
-      _moveUp();
+      moveUp(_status.holePossition, _status.config);
     } else if (event.keyCode == KeyCode.DOWN) {
-      _moveDown();
+      moveDown(_status.holePossition, _status.config);
     }
-  }
+  }*/
 
   void _moveLeft() {
     if (_status.holePossition.col < _status.config.cols - 1) {
       var origin = new Possition(_status.holePossition.row, _status.holePossition.col + 1);
-      _moveToHole(origin);
+      moveToHole(origin, _status.holePossition, _status.config);
     }
   }
 
   void _moveRight() {
     if (_status.holePossition.col > 0) {
       var origin = new Possition(_status.holePossition.row, _status.holePossition.col - 1);
-      _moveToHole(origin);
+      moveToHole(origin, _status.holePossition, _status.config);
     }
   }
 
-  void _moveUp() {
-    if (_status.holePossition.row < _status.config.rows - 1) {
-      var origin = new Possition(_status.holePossition.row + 1, _status.holePossition.col);
-      _moveToHole(origin);
-    }
-  }
-
-  void _moveDown() {
-    if (_status.holePossition.row > 0) {
-      var origin = new Possition(_status.holePossition.row - 1, _status.holePossition.col);
-      _moveToHole(origin);
-    }
-  }
 
   void randomize() {
     for (var i in range(_status.config.cols * _status.config.rows * 20)) {
@@ -130,10 +105,10 @@ class Plain {
         _moveRight();
       }
       if (random == 2) {
-        _moveUp();
+        moveUp(_status.holePossition, _status.config);
       }
       if (random == 3) {
-        _moveDown();
+        moveDown(_status.holePossition, _status.config);
       }
 
     }

@@ -70,9 +70,9 @@ class Toroidal {
     if (_status.startDrag != null) {
       if ((possition.col - _status.startDrag.col).abs().round() == 1  &&  possition.row == _status.startDrag.row) {
         if (possition.col > _status.startDrag.col) {
-          _moveRowRight(_status.startDrag.row);
+          moveRowRight(_status.startDrag.row, _status.config);
         } else {
-          _moveRowLeft(_status.startDrag.row);
+          moveRowLeft(_status.startDrag.row, _status.config);
         }
         _status.startDrag = possition;
         _status.moved = true;
@@ -87,27 +87,6 @@ class Toroidal {
         _status.moved = true;
       }
     }
-  }
-
-
-  void _moveRowLeft(int row) {
-    var tempCanvas = copyToTempCanvas(new Possition(row, 0), _status.config);
-    for (var c in range(0, _status.config.cols - 1, 1)) {
-      Possition origin = new Possition(row, c + 1);
-      Possition destiny = new Possition(row, c);
-      copyTo(origin, destiny, _status.config);
-    }
-    copyFromTempCanvas(new Possition(row, _status.config.cols - 1), tempCanvas, _status.config);
-  }
-
-  void _moveRowRight(int row) {
-    var tempCanvas = copyToTempCanvas(new Possition(row, _status.config.cols - 1), _status.config);
-    for (var c in range(_status.config.cols - 2, -1, -1)) {
-      Possition origin = new Possition(row, c);
-      Possition destiny = new Possition(row, c + 1);
-      copyTo(origin, destiny, _status.config);
-    }
-    copyFromTempCanvas(new Possition(row, 0), tempCanvas, _status.config);
   }
 
 
@@ -146,9 +125,9 @@ class Toroidal {
         var rrow = rang.nextInt(_status.config.rows);
         var rdir = rang.nextInt(2);
         if (rdir == 0) {
-          _moveRowLeft(rrow);
+          moveRowLeft(rrow, _status.config);
         } else {
-          _moveRowRight(rrow);
+          moveRowRight(rrow, _status.config);
         }
       }
     }
