@@ -220,11 +220,16 @@ void _prepareCanvasGen(Config config, var drawCell) {
 void _drawNumberCell(int r, int c, Rect rect, Config config) {
   var piezeWidth = getPiezeWidth(config);
   var piezeHeight = getPiezeHeight(config);
+  var pieceValue = (r * config.cols + c + 1).toString();
+  if(config.samLoyd &&  c==1  &&  r==3)
+    pieceValue = "15";
+  if(config.samLoyd &&  c==2  &&  r==3)
+    pieceValue = "14";
   getContext()
       ..fillStyle = "white"
       ..fillRect(rect.x, rect.y, rect.width, rect.height)
       ..fillStyle = "blue"
-      ..fillText((r * config.cols + c + 1).toString(), rect.x + piezeWidth / 3, rect.y + piezeHeight / 3);
+      ..fillText(pieceValue, rect.x + piezeWidth / 3, rect.y + piezeHeight / 3);
 }
 
 

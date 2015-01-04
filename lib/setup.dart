@@ -23,6 +23,11 @@ class Config {
   var cols = 4;
   ImageType  imageType = ImageType.PICTURE;
 
+  //  tricky
+  bool samLoyd = false;
+  bool configuringSamLoyd = false;    //  trick
+
+
   _ConfigWidgets _widgets = new _ConfigWidgets();
   var _puzzle;
   ImageElement currentImage;
@@ -58,6 +63,7 @@ class _ConfigWidgets {
   RadioButtonInputElement radioColors = querySelector("#radio_colors");
   RadioButtonInputElement radio2Colors = querySelector("#radio_2colors");
   SelectElement imageList = querySelector("#image_list");
+  CheckboxInputElement  samLoyd = querySelector("#sam_loyd");
 
   _ConfigWidgets() {
     querySelector("#randomize_button").onClick.listen((_) => _randomizePuzzle());
@@ -73,6 +79,8 @@ class _ConfigWidgets {
     radioColors.onChange.listen((_) => updateFromHTMLSetup());
     radio2Colors.onChange.listen((_) => updateFromHTMLSetup());
 
+    samLoyd.onChange.listen((_) => _updatedSamLoyd());
+
     for(var imageName in localImages){
       OptionElement option = new OptionElement();
       option.text = imageName;
@@ -80,8 +88,22 @@ class _ConfigWidgets {
     }
     imageList.onChange.listen((_) => updateFromHTMLSetup());
   }
+
 }
 
+void _updatedSamLoyd() {
+    if(_config._widgets.samLoyd.checked == true) {
+      _config.configuringSamLoyd = true;
+      _config.topology = Topology.PLAIN;
+      _config.cols = 4;
+      _config.rows = 4;
+      _config.imageType = ImageType.NUMBERS;
+      _config.samLoyd = true;
+      updateHTMLFromSetup();
+      updateFromHTMLSetup();
+      _config.configuringSamLoyd = false;
+    }
+}
 
 void _showHideDivs(var div1, var div2){
   if(div1.style.display != "") {
@@ -130,6 +152,10 @@ void updateFromHTMLSetup() {
   writeLog("init updateFromHTMLSetup");
   if (_config == null) {
     _config = new Config();
+  }
+
+  if(_config.configuringSamLoyd == false) {
+    _config._widgets.samLoyd.checked = false;
   }
 
   if(_config._widgets.radioPicture.checked)
