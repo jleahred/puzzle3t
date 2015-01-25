@@ -1,6 +1,6 @@
 # Puzzle
 
-A small web/client program to play with sliding puzzles
+A small web/client program to play with sliding puzzles [(link)](http://jleahred.github.io/apps/puzzle3t/index.html)
 
 There are three kind of topologies
 
